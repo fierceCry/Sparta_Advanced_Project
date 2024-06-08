@@ -2,10 +2,10 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma.util.js';
 import { ENV_KEY } from '../constants/env.constant.js';
 import { AUTH_MESSAGES } from '../constants/user.constant.js';
-import { catchAsync } from './error-handler.middleware.js';
 
 /** accessToken 토큰 검증 API **/
-const authMiddleware = catchAsync(async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
+  try{
     const accessToken = req.headers.authorization;
     if (!accessToken) {
       return res.status(400).json({ message: AUTH_MESSAGES.NO_AUTH_INFO });
@@ -31,7 +31,10 @@ const authMiddleware = catchAsync(async (req, res, next) => {
     }
     req.user = user;
     next();
-});
+  }catch(error){
+    next(error)
+  }
+};
 
 const validateToken = async (token, secretKey) => {
   try {

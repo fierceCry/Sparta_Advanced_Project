@@ -1,12 +1,14 @@
 import express from 'express';
-import { UsersController } from '../controllers/users.controller.js';
+import { UserController } from '../controllers/users.controller.js';
+import { authMiddleware } from '../middlewarmies/require-access-token.middleware.js';
+import { refreshTokenMiddleware } from '../middlewarmies/require-refresh-token.middleware.js';
 
-const usersRouter = express.Router();
+const userRouter = express.Router();
 
-const usersController  = new UsersController();
+const userController = new UserController();
 
-usersRouter.get('/profile')
-usersRouter.post('/token/refresh')
-usersRouter.get('/logout')
+userRouter.get('/profile', authMiddleware, userController.getProfile);
+userRouter.post('/token/refresh', refreshTokenMiddleware, userController.refreshToken);
+userRouter.get('/logout', refreshTokenMiddleware, userController.logout);
 
-export { usersRouter };
+export { userRouter };

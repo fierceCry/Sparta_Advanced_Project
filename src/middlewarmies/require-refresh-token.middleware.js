@@ -1,12 +1,12 @@
 import { prisma } from '../utils/prisma.util.js';
 import { ENV_KEY } from '../constants/env.constant.js';
 import { AUTH_MESSAGES } from '../constants/user.constant.js';
-import { catchAsync } from './error-handler.middleware.js';
+// import { catchAsync } from './error-handler.middleware.js';
 import { validateToken } from './require-access-token.middleware.js';
 import bcrypt from 'bcrypt';
 
 /** RefreshToken 토큰 검증 및 재발급 미들웨어 **/
-const refreshTokenMiddleware = catchAsync(async (req, res, next) => {
+const refreshTokenMiddleware = async (req, res, next) => {
   const refreshToken = req.headers.authorization;
   if (!refreshToken) {
     return res
@@ -45,6 +45,6 @@ const refreshTokenMiddleware = catchAsync(async (req, res, next) => {
   }
   req.user = user;
   next();
-});
+};
 
 export { refreshTokenMiddleware };

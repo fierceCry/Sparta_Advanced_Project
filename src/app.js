@@ -1,6 +1,6 @@
 import express from 'express';
 import logMiddleware from './middlewarmies/log.middleware.js';
-import route from './routers/index.js';
+import { route } from './routers/index.js';
 import { globalErrorHandler } from './middlewarmies/error-handler.middleware.js';
 import { ENV_KEY } from './constants/env.constant.js';
 

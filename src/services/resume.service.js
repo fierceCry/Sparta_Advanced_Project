@@ -1,12 +1,14 @@
 import { ResumesRepository } from '../repositories/resume.repositories.js';
+import { NotFoundError, ForbiddenError } from '../errors/http.error.js';
+import { MESSAGES } from '../constants/message.constant.js';
 
 export class ResumesService {
   constructor() {
     this.resumesRepository = new ResumesRepository();
   }
 
-  createResume = async (userId, resumerData) => {
-    return await this.resumesRepository.createResume(userId, resumerData);
+  createResume = async (userId, resumeData) => {
+    return await this.resumesRepository.createResume(userId, resumeData);
   };
 
   getResumes = async (userId, role, query) => {
@@ -33,26 +35,26 @@ export class ResumesService {
   getResumeById = async (userId, role, resumeId) => {
     const resume = await this.resumesRepository.findResumeById(resumeId);
     if (!resume) {
-      throw new Error('이력서가 존재하지 않습니다.');
+      throw new NotFoundError(MESSAGES.RESUMES.COMMON.NOT_FOUND);
     }
     if (role === 'APPLICANT' && resume.userId !== userId) {
-      throw new Error('접근이 거부되었습니다.');
+      throw new ForbiddenError(MESSAGES.AUTH.COMMON.FORBIDDEN);
     }
     return resume;
   };
 
-  updateResume = async (userId, resumeId, data) => {
+  updateResume = async (userId, resumeId, title, content) => {
     const existingResume = await this.resumesRepository.findResumeByUserIdAndId(userId, resumeId);
     if (!existingResume) {
-      throw new Error('이력서가 존재하지 않습니다.');
+      throw new NotFoundError(MESSAGES.RESUMES.COMMON.NOT_FOUND);
     }
-    return await this.resumesRepository.updateResume(existingResume.id, data);
+    return await this.resumesRepository.updateResume(existingResume.id, title, content);
   };
 
   deleteResume = async (userId, resumeId) => {
     const existingResume = await this.resumesRepository.findResumeByUserIdAndId(userId, resumeId);
     if (!existingResume) {
-      throw new Error('이력서가 존재하지 않습니다.');
+      throw new NotFoundError(MESSAGES.RESUMES.COMMON.NOT_FOUND);
     }
     return await this.resumesRepository.deleteResume(existingResume.id);
   };

@@ -1,12 +1,12 @@
 import { prisma } from '../utils/prisma.util.js';
 
 export class ResumesRepository {
-  createResume = async (userId, resumerData) => {
+  createResume = async (userId, resumeData) => {
     return await prisma.resume.create({
       data: {
         userId: userId,
-        title: resumerData.title,
-        content: resumerData.content,
+        title: resumeData.title,
+        content: resumeData.content,
       },
     });
   };
@@ -33,34 +33,42 @@ export class ResumesRepository {
     return await prisma.resume.findFirst({
       where: { id: +resumeId },
     });
-  };
+  }
 
   findResumeByUserIdAndId = async (userId, resumeId) => {
     return await prisma.resume.findFirst({
       where: {
-        id: resumeId,
+        id: +resumeId,
         userId: userId,
       },
     });
   };
 
-  updateResume = async (resumeId, data) => {
+  updateResume = async (resumeId, title, content) => {
     return await prisma.resume.update({
       where: {
-        id: resumeId,
+        id: +resumeId,
       },
       data: {
-        ...(data.title && { title: data.title }),
-        ...(data.content && { content: data.content }),
+        ...(title && { title: title }),
+        ...(content && { content: content }),
       },
     });
   };
 
   deleteResume = async (resumeId) => {
-    return await prisma.resume.delete({
-      where: {
-        id: resumeId,
-      },
+    return await prisma.$transaction(async (tx) => {
+      await tx.resumeLog.deleteMany({
+        where: {
+          resumeId: +resumeId,
+        },
+      });
+
+      return await tx.resume.delete({
+        where: {
+          id: +resumeId,
+        },
+      });
     });
   };
 
@@ -70,13 +78,13 @@ export class ResumesRepository {
 
     return await prisma.$transaction(async (tx) => {
       await tx.resume.update({
-        where: { id: resumeId },
+        where: { id: +resumeId },
         data: { applyStatus: data.resumeStatus },
       });
 
       return await tx.resumeLog.create({
         data: {
-          resume: { connect: { id: resumeId } },
+          resume: { connect: { id: +resumeId } },
           recruiter: { connect: { id: recruiter.id } },
           oldApplyStatus: resume.applyStatus,
           newApplyStatus: data.resumeStatus,
@@ -92,7 +100,7 @@ export class ResumesRepository {
         createdAt: 'desc',
       },
       where: {
-        resumeId: parseInt(resumeId),
+        resumeId: +resumeId,
       },
       select: {
         id: true,

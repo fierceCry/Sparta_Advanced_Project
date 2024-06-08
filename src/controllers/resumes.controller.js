@@ -40,10 +40,10 @@ export class ResumesController {
 
   updateResume = async (req, res, next) => {
     try {
-      const data = req.body;
       const { id } = req.user;
+      const { title, content } = req.body;
       const { resumeId } = req.params;
-      const updatedResume = await this.resumesService.updateResume(id, resumeId, data);
+      const updatedResume = await this.resumesService.updateResume(id, resumeId, title, content);
       return res.status(200).json({ data: updatedResume });
     } catch (error) {
       next(error);

@@ -1,5 +1,5 @@
 import Joi from 'joi';
-
+import { MESSAGES } from '../../constants/message.constant.js';
 /** 유저 로그인 joi **/
 export const userLoginSchema = async (req, res, next) => {
   try {
@@ -9,8 +9,8 @@ export const userLoginSchema = async (req, res, next) => {
         .required()
         .empty('')
         .messages({
-          'string.email': '이메일 형식이 올바르지 않습니다.',
-          'any.required': '이메일을 입력해 주세요.',
+          'string.email': MESSAGES.AUTH.COMMON.EMAIL.INVALID_FORMAT,
+          'any.required': MESSAGES.AUTH.COMMON.EMAIL.REQUIRED,
         }),
 
       password: Joi.string()
@@ -18,8 +18,8 @@ export const userLoginSchema = async (req, res, next) => {
         .required()
         .empty('')
         .messages({
-          'string.min': '비밀번호는 6자리 이상이어야 합니다.',
-          'any.required': '비밀번호를 입력해 주세요.',
+          'string.min': MESSAGES.AUTH.COMMON.PASSWORD.MIN_LENGTH,
+          'any.required': MESSAGES.AUTH.COMMON.PASSWORD.REQURIED,
         }),
     });
     await userSchema.validateAsync(req.body);

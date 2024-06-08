@@ -1,12 +1,12 @@
 import express from 'express';
-import logMiddleware from './middlewarmies/log.middleware.js';
+import { requestLogger } from './middlewarmies/log.middleware.js';
 import { route } from './routers/index.js';
 import { globalErrorHandler } from './middlewarmies/error-handler.middleware.js';
 import { ENV_KEY } from './constants/env.constant.js';
 
 const app = express();
 
-app.use(logMiddleware)
+app.use(requestLogger)
 app.use(express.json())
 app.use(route)
 app.use(globalErrorHandler);

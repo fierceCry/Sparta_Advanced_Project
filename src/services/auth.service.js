@@ -1,21 +1,21 @@
-import { AuthRepositores } from '../repositories/auth.repositories.js';
-import bcrypt from 'bcrypt';
-import { ENV_KEY } from '../constants/env.constant.js';
-import { AUTH_MESSAGES } from '../constants/auth.constant.js';
 import jwt from 'jsonwebtoken';
-import { BadRequestError } from '../errors/http.error.js';
-
+import bcrypt from 'bcrypt';
+import { AuthRepositores } from '../repositories/auth.repositories.js';
+import { ENV_KEY } from '../constants/env.constant.js';
+import { MESSAGES } from '../constants/message.constant.js';
+import { BadRequestError, UnauthorizedError} from '../errors/http.error.js';
+import { HASH_SALT_ROUNDS, ACCESS_TOKEN_EXPIRES_IN, REFRESH_TOKEN_EXPIRES_IN } from '../constants/auth.constant.js';
 export class AuthService {
   authRepositores = new AuthRepositores();
 
   signUp = async (email, password, nickname) => {
     const userData = await this.authRepositores.findOne(email);
     if (userData) {
-      throw new BadRequestError('이미 가입 된 사용자입니다.');
+      throw new BadRequestError(MESSAGES.AUTH.COMMON.EMAIL.DUPLICATED);
     }
     const hashPasswrd = bcrypt.hashSync(
       password,
-      parseInt(ENV_KEY.SALT_ROUNDS)
+      HASH_SALT_ROUNDS
     );
     const { password: _, ...result } = await this.authRepositores.userCreate(
       email,
@@ -29,40 +29,32 @@ export class AuthService {
   signIn = async (email, password) => {
     const userData = await this.authRepositores.findOne(email);
     if (!userData) {
-      return AUTH_MESSAGES.INVALID_AUTH;
+      throw new UnauthorizedError(MESSAGES.AUTH.COMMON.EMAIL.INVALID_USER);
     }
 
     const isMatched = bcrypt.compareSync(password, userData.password);
     if (!isMatched) {
-      throw new BadRequestError('비밀번호가 맞지 않습니다.');
+      throw new UnauthorizedError(MESSAGES.AUTH.COMMON.UNAUTHORIZED);
     }
-
-    const accessToken = jwt.sign(
-      {
-        id: userData.id,
-      },
-      ENV_KEY.SECRET_KEY,
-      {
-        expiresIn: ENV_KEY.JWT_EXPIRATION_TIME,
-      }
-    );
-
-    const refreshToken = jwt.sign(
-      {
-        id: userData.id,
-      },
-      ENV_KEY.REFRESH_SECRET_KEY,
-      {
-        expiresIn: ENV_KEY.REFRESH_TOKEN_EXPIRATION_TIME,
-      }
-    );
+    const { accessToken, refreshToken } = this.generateTokens(userData.id);
 
     const hashRefreshToken = bcrypt.hashSync(
       refreshToken,
-      parseInt(ENV_KEY.SALT_ROUNDS)
+      HASH_SALT_ROUNDS
     );
     await this.authRepositores.token(userData.id, hashRefreshToken);
     return { accessToken, refreshToken };
   };
 
+  generateTokens = (userId) => {
+    const accessToken = jwt.sign({ id: userId }, ENV_KEY.SECRET_KEY, {
+      expiresIn: ACCESS_TOKEN_EXPIRES_IN
+    });
+
+    const refreshToken = jwt.sign({ id: userId }, ENV_KEY.REFRESH_SECRET_KEY, {
+      expiresIn: REFRESH_TOKEN_EXPIRES_IN
+    });
+
+    return { accessToken, refreshToken };
+  };
 }

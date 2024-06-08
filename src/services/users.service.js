@@ -3,9 +3,7 @@ import { ENV_KEY } from '../constants/env.constant.js';
 import jwt from 'jsonwebtoken';
 
 export class UserService {
-  constructor() {
-    this.userRepository = new UserRepository();
-  }
+  userRepository = new UserRepository();
 
   getUserProfile = async (userId) => {
     const user = await this.userRepository.findById(userId);

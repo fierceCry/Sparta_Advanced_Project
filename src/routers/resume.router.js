@@ -5,6 +5,7 @@ import { resumerCreatesSchema } from '../middlewarmies/validation/resumeCreate.v
 import { resumerUpdateSchema } from '../middlewarmies/validation/resumeUpdate.validation.middleware.js';
 import {resumerLogSchema } from '../middlewarmies/validation/resumeLogCreate.validation.middleware.js';
 import { requireRoles } from '../middlewarmies/require-roles.middleware.js';
+import { USER_ROLE } from '../constants/user.constant.js';
 
 const resumeRouter = express.Router();
 
@@ -14,7 +15,7 @@ const resumesController  = new ResumesController();
 resumeRouter.post('/', authMiddleware, resumerCreatesSchema, resumesController.createResume);
 
 /** 이력서 목록 조회 API **/
-resumeRouter.get('/', authMiddleware, resumesController.getResumes);
+resumeRouter.get('/list', authMiddleware, resumesController.getResumes);
 
 /** 이력서 상세 조회 API **/
 resumeRouter.get('/:resumeId', authMiddleware, resumesController.getResumeById);
@@ -29,7 +30,7 @@ resumeRouter.delete('/:resumeId', authMiddleware, resumesController.deleteResume
 resumeRouter.patch('/:resumeId/logs', authMiddleware, resumerLogSchema, requireRoles(['RECRUITER']), resumesController.createResumeLog);
 
 /** 이력서 로그 상세 조회 API **/
-resumeRouter.get('/:resumeId/status', authMiddleware, requireRoles(['RECRUITER']), resumesController.getResumeLogs);
+resumeRouter.get('/:resumeId/logs', authMiddleware, requireRoles([USER_ROLE.RECRUITER]), resumesController.getResumeLogs);
 
 
 export { resumeRouter };

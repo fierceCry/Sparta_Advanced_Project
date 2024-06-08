@@ -1,5 +1,6 @@
 import Joi from 'joi';
-
+import { MESSAGES } from '../../constants/message.constant.js';
+import { MIN_PASSWORD_LENGTH } from '../../constants/auth.constant.js';
 /** 유저 회원가입 joi **/
 export const userCreateSchema = async(req, res, next) => {
   try {
@@ -9,17 +10,17 @@ export const userCreateSchema = async(req, res, next) => {
         .required()
         .empty('')
         .messages({
-          'string.email': '이메일 형식이 올바르지 않습니다.',
-          'any.required': '이메일을 입력해 주세요.',
+          'string.email': MESSAGES.AUTH.COMMON.EMAIL.INVALID_FORMAT,
+          'any.required': MESSAGES.AUTH.COMMON.EMAIL.REQUIRED,
         }),
 
       password: Joi.string()
-        .min(6) // 최소 6자리 확인
+        .min(MIN_PASSWORD_LENGTH) // 최소 6자리 확인
         .required()
         .empty('')
         .messages({
-          'string.min': '비밀번호는 6자리 이상이어야 합니다.',
-          'any.required': '비밀번호를 입력해 주세요.',
+          'string.min': MESSAGES.AUTH.COMMON.PASSWORD.MIN_LENGTH,
+          'any.required': MESSAGES.AUTH.COMMON.PASSWORD.REQURIED,
         }),
 
       checkPassword: Joi.string()
@@ -27,17 +28,13 @@ export const userCreateSchema = async(req, res, next) => {
         .required()
         .empty('')
         .messages({
-          'any.only': '입력 한 두 비밀번호가 일치하지 않습니다.',
-          'any.required': '비밀번호 확인을 입력해 주세요.',
+          'any.only': MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.NOT_MACHTED_WITH_PASSWORD,
+          'any.required': MESSAGES.AUTH.COMMON.PASSWORD_CONFIRM.REQURIED,
         }),
 
-      nickName: Joi.string().required().empty('').messages({
-        'any.required': '이름을 입력해 주세요.',
-      }),
-
-      role: Joi.string().optional().messages({
-        'string.base': '역할은 문자열이어야 합니다.',
-      }),
+        nickname: Joi.string().required().empty('').messages({
+          'any.required': MESSAGES.AUTH.COMMON.NAME.REQURIED,
+        }),
     });
     await userSchema.validateAsync(req.body);
     next();

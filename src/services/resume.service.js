@@ -1,10 +1,10 @@
-import { ResumesRepository } from '../repositories/resume.repositories.js';
+// import { ResumesRepository } from '../repositories/resume.repositories.js';
 import { NotFoundError, ForbiddenError } from '../errors/http.error.js';
 import { MESSAGES } from '../constants/message.constant.js';
 
 export class ResumesService {
-  constructor() {
-    this.resumesRepository = new ResumesRepository();
+  constructor(resumesRepository) {
+    this.resumesRepository = resumesRepository;
   }
 
   createResume = async (userId, resumeData) => {

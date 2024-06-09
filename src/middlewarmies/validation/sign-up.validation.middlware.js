@@ -6,7 +6,7 @@ export const userCreateSchema = async(req, res, next) => {
   try {
     const userSchema = Joi.object({
       email: Joi.string()
-        .email({ tlds: { allow: false } }) // 이메일 형식을 확인
+        .email({ tlds: { allow: false } })
         .required()
         .empty('')
         .messages({
@@ -15,7 +15,7 @@ export const userCreateSchema = async(req, res, next) => {
         }),
 
       password: Joi.string()
-        .min(MIN_PASSWORD_LENGTH) // 최소 6자리 확인
+        .min(MIN_PASSWORD_LENGTH)
         .required()
         .empty('')
         .messages({
@@ -24,7 +24,7 @@ export const userCreateSchema = async(req, res, next) => {
         }),
 
       checkPassword: Joi.string()
-        .valid(Joi.ref('password')) // password 참고
+        .valid(Joi.ref('password'))
         .required()
         .empty('')
         .messages({

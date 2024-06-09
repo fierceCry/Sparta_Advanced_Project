@@ -1,8 +1,11 @@
-import { prisma } from '../utils/prisma.util.js';
+// import { prisma } from '../utils/prisma.util.js';
 
 export class ResumesRepository {
+  constructor(prisma){
+    this.prisma = prisma;
+  }
   createResume = async (userId, resumeData) => {
-    return await prisma.resume.create({
+    return await this.prisma.resume.create({
       data: {
         userId: userId,
         title: resumeData.title,
@@ -12,7 +15,7 @@ export class ResumesRepository {
   };
 
   findResumes = async (whereClause, sortBy, order) => {
-    return await prisma.resume.findMany({
+    return await this.prisma.resume.findMany({
       where: whereClause,
       orderBy: {
         [sortBy]: order,
@@ -30,13 +33,13 @@ export class ResumesRepository {
   };
 
   findResumeById = async (resumeId) => {
-    return await prisma.resume.findFirst({
+    return await this.prisma.resume.findFirst({
       where: { id: +resumeId },
     });
   }
 
   findResumeByUserIdAndId = async (userId, resumeId) => {
-    return await prisma.resume.findFirst({
+    return await this.prisma.resume.findFirst({
       where: {
         id: +resumeId,
         userId: userId,
@@ -45,7 +48,7 @@ export class ResumesRepository {
   };
 
   updateResume = async (resumeId, title, content) => {
-    return await prisma.resume.update({
+    return await this.prisma.resume.update({
       where: {
         id: +resumeId,
       },
@@ -57,7 +60,7 @@ export class ResumesRepository {
   };
 
   deleteResume = async (resumeId) => {
-    return await prisma.$transaction(async (tx) => {
+    return await this.prisma.$transaction(async (tx) => {
       await tx.resumeLog.deleteMany({
         where: {
           resumeId: +resumeId,
@@ -74,15 +77,15 @@ export class ResumesRepository {
 
   createResumeLog = async (userId, resumeId, data) => {
     const resume = await this.findResumeById(resumeId);
-    const recruiter = await prisma.user.findUnique({ where: { id: userId } });
+    const recruiter = await this.prisma.user.findUnique({ where: { id: userId } });
 
-    return await prisma.$transaction(async (tx) => {
-      await tx.resume.update({
+    return await this.prisma.$transaction(async (tx) => {
+      await this.tx.resume.update({
         where: { id: +resumeId },
         data: { applyStatus: data.resumeStatus },
       });
 
-      return await tx.resumeLog.create({
+      return await this.tx.resumeLog.create({
         data: {
           resume: { connect: { id: +resumeId } },
           recruiter: { connect: { id: recruiter.id } },
@@ -95,7 +98,7 @@ export class ResumesRepository {
   };
 
   findResumeLogs = async (resumeId) => {
-    return await prisma.resumeLog.findMany({
+    return await this.prisma.resumeLog.findMany({
       orderBy: {
         createdAt: 'desc',
       },

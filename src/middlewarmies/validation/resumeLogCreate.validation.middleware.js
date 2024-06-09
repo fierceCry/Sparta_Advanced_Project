@@ -1,6 +1,6 @@
 import Joi from 'joi';
 import { MESSAGES } from '../../constants/message.constant.js';
-import { RESUME_STATUS } from '../../constants/resume.constant.js'; // RESUME_STATUS 상수가 정의된 파일을 가져와야 함
+import { RESUME_STATUS } from '../../constants/resume.constant.js';
 
 /** 이력서 로그 생성 joi**/
 export const resumerLogSchema = async (req, res, next) => {

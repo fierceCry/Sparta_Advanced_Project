@@ -1,8 +1,7 @@
-import { ResumesService } from '../services/resume.service.js';
-
+import { HTTP_STATUS } from "../constants/http-status.constant.js";
 export class ResumesController {
-  constructor() {
-    this.resumesService = new ResumesService();
+  constructor(resumesService) {
+    this.resumesService = resumesService;
   }
 
   createResume = async (req, res, next) => {
@@ -10,7 +9,7 @@ export class ResumesController {
       const { id } = req.user;
       const resumerData = req.body;
       const result = await this.resumesService.createResume(id, resumerData);
-      return res.status(200).json({ data: result });
+      return res.status(HTTP_STATUS.OK).json({ data: result });
     } catch (error) {
       next(error);
     }
@@ -21,7 +20,7 @@ export class ResumesController {
       const { id, role } = req.user;
       const query = req.query;
       const resumes = await this.resumesService.getResumes(id, role, query);
-      return res.status(200).json({ data: resumes });
+      return res.status(HTTP_STATUS.OK).json({ data: resumes });
     } catch (error) {
       next(error);
     }
@@ -32,7 +31,7 @@ export class ResumesController {
       const { id, role } = req.user;
       const { resumeId } = req.params;
       const resume = await this.resumesService.getResumeById(id, role, resumeId);
-      return res.status(200).json({ data: resume });
+      return res.status(HTTP_STATUS.OK).json({ data: resume });
     } catch (error) {
       next(error);
     }
@@ -44,7 +43,7 @@ export class ResumesController {
       const { title, content } = req.body;
       const { resumeId } = req.params;
       const updatedResume = await this.resumesService.updateResume(id, resumeId, title, content);
-      return res.status(200).json({ data: updatedResume });
+      return res.status(HTTP_STATUS.OK).json({ data: updatedResume });
     } catch (error) {
       next(error);
     }
@@ -55,7 +54,7 @@ export class ResumesController {
       const { id } = req.user;
       const { resumeId } = req.params;
       const deletedResumeId = await this.resumesService.deleteResume(id, resumeId);
-      return res.status(200).json({ data: deletedResumeId });
+      return res.status(HTTP_STATUS.OK).json({ data: deletedResumeId });
     } catch (error) {
       next(error);
     }
@@ -67,7 +66,7 @@ export class ResumesController {
       const data = req.body;
       const { resumeId } = req.params;
       const result = await this.resumesService.createResumeLog(userId, resumeId, data);
-      return res.status(200).json({ data: result });
+      return res.status(HTTP_STATUS.OK).json({ data: result });
     } catch (error) {
       next(error);
     }
@@ -77,7 +76,7 @@ export class ResumesController {
     try {
       const { resumeId } = req.params;
       const logs = await this.resumesService.getResumeLogs(resumeId);
-      return res.status(200).json({ data: logs });
+      return res.status(HTTP_STATUS.OK).json({ data: logs });
     } catch (error) {
       next(error);
     }

@@ -6,10 +6,14 @@ import { resumerUpdateSchema } from '../middlewarmies/validation/resumeUpdate.va
 import {resumerLogSchema } from '../middlewarmies/validation/resumeLogCreate.validation.middleware.js';
 import { requireRoles } from '../middlewarmies/require-roles.middleware.js';
 import { USER_ROLE } from '../constants/user.constant.js';
-
+import { ResumesService } from '../services/resume.service.js';
+import { ResumesRepository } from '../repositories/resume.repository.js';
+import { prisma } from '../utils/prisma.util.js';
 const resumeRouter = express.Router();
 
-const resumesController  = new ResumesController();
+const resumesRepository = new ResumesRepository(prisma);
+const resumesService = new ResumesService(resumesRepository);
+const resumesController  = new ResumesController(resumesService);
 
 /** 이력서 생성 API **/
 resumeRouter.post('/', authMiddleware, resumerCreatesSchema, resumesController.createResume);

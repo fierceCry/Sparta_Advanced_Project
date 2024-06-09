@@ -1,25 +1,27 @@
-import { AuthService } from '../services/auth.service.js';
+import { HTTP_STATUS } from '../constants/http-status.constant.js';
+
 export class AuthsController {
-  authService = new AuthService();
+  constructor(authService) {
+    this.authService = authService;
+  }
 
   signUp = async (req, res, next) => {
     try {
       const { email, password, nickname } = req.body;
-
       const userData = await this.authService.signUp(email, password, nickname);
-      return res.status(200).json({ data: userData });
+      return res.status(HTTP_STATUS.OK).json({ data: userData });
     } catch (error) {
       next(error);
     }
   };
 
   signIn = async (req, res, next) => {
-    try{
-      const { email, password} = req.body
+    try {
+      const { email, password } = req.body;
       const userData = await this.authService.signIn(email, password);
-      return res.status(200).json({ data: userData });
-    }catch(error){
-      next(error)
+      return res.status(HTTP_STATUS.OK).json({ data: userData });
+    } catch (error) {
+      next(error);
     }
   };
 }

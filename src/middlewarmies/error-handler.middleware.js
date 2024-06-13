@@ -1,8 +1,13 @@
+import { HttpError } from '../errors/http.error.js';
+
 const globalErrorHandler = (err, req, res, next) => {
   console.error(err.stack);
 
-  if (err instanceof Error && err.statusCode) {
-    return res.status(err.statusCode).json({ message: err.message });
+  const errorClasses = Object.values(HttpError);
+  const errorInstance = errorClasses.find((errorClass) => err instanceof errorClass);
+
+  if (errorInstance) {
+    return res.status(err.status).json({ message: err.message });
   }
 
   if (err instanceof Error && err.name === 'ValidationError') {

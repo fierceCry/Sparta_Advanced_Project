@@ -7,7 +7,7 @@ import {
 } from '../errors/http.error.js';
 import { UserRepository } from '../repositories/users.repository.js';
 
-const userRepository = new UserRepository();
+const userRepository = new UserRepository(prisma);
 
 const validateToken = async (token, secretKey) => {
   try {
@@ -41,7 +41,6 @@ const authMiddleware = async (req, res, next) => {
     } else if (payload === 'JsonWebTokenError') {
       throw new HttpError.Unauthorized(MESSAGES.AUTH.COMMON.JWT.INVALID);
     }
-
     const user = await userRepository.findById(payload.id);
     if (!user) {
       throw new HttpError.NotFound(MESSAGES.AUTH.COMMON.JWT.NO_USER);

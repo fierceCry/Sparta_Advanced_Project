@@ -3,10 +3,11 @@ import { prisma } from '../utils/prisma.util.js';
 import { ENV_KEY } from '../constants/env.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
 import {
-  BadRequestError,
-  UnauthorizedError,
-  NotFoundError,
+  HttpError
 } from '../errors/http.error.js';
+import { UserRepository } from '../repositories/users.repository.js';
+
+const userRepository = new UserRepository();
 
 const validateToken = async (token, secretKey) => {
   try {
@@ -26,26 +27,24 @@ const authMiddleware = async (req, res, next) => {
   try {
     const authorizationHeader = req.headers.authorization;
     if (!authorizationHeader) {
-      throw new BadRequestError(MESSAGES.AUTH.COMMON.JWT.NO_TOKEN);
+      throw new HttpError.BadRequest(MESSAGES.AUTH.COMMON.JWT.NO_TOKEN);
     }
 
     const token = authorizationHeader.split('Bearer ')[1];
     if (!token) {
-      throw new UnauthorizedError(MESSAGES.AUTH.COMMON.JWT.NOT_SUPPORTED_TYPE);
+      throw new HttpError.Unauthorized(MESSAGES.AUTH.COMMON.JWT.NOT_SUPPORTED_TYPE);
     }
 
     const payload = await validateToken(token, ENV_KEY.SECRET_KEY);
     if (payload === 'expired') {
-      throw new UnauthorizedError(MESSAGES.AUTH.COMMON.JWT.EXPIRED);
+      throw new HttpError.Unauthorized(MESSAGES.AUTH.COMMON.JWT.EXPIRED);
     } else if (payload === 'JsonWebTokenError') {
-      throw new UnauthorizedError(MESSAGES.AUTH.COMMON.JWT.INVALID);
+      throw new HttpError.Unauthorized(MESSAGES.AUTH.COMMON.JWT.INVALID);
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: payload.id },
-    });
+    const user = await userRepository.findById(payload.id);
     if (!user) {
-      throw new NotFoundError(MESSAGES.AUTH.COMMON.JWT.NO_USER);
+      throw new HttpError.NotFound(MESSAGES.AUTH.COMMON.JWT.NO_USER);
     }
     req.user = user;
     next();

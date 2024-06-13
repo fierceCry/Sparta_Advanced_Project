@@ -1,5 +1,5 @@
 // import { ResumesRepository } from '../repositories/resume.repositories.js';
-import { NotFoundError, ForbiddenError } from '../errors/http.error.js';
+import { HttpError } from '../errors/http.error.js';
 import { MESSAGES } from '../constants/message.constant.js';
 
 export class ResumesService {
@@ -35,10 +35,10 @@ export class ResumesService {
   getResumeById = async (userId, role, resumeId) => {
     const resume = await this.resumesRepository.findResumeById(resumeId);
     if (!resume) {
-      throw new NotFoundError(MESSAGES.RESUMES.COMMON.NOT_FOUND);
+      throw new HttpError.NotFound(MESSAGES.RESUMES.COMMON.NOT_FOUND);
     }
     if (role === 'APPLICANT' && resume.userId !== userId) {
-      throw new ForbiddenError(MESSAGES.AUTH.COMMON.FORBIDDEN);
+      throw new HttpError.Forbidden(MESSAGES.AUTH.COMMON.FORBIDDEN);
     }
     return resume;
   };
@@ -46,7 +46,7 @@ export class ResumesService {
   updateResume = async (userId, resumeId, title, content) => {
     const existingResume = await this.resumesRepository.findResumeByUserIdAndId(userId, resumeId);
     if (!existingResume) {
-      throw new NotFoundError(MESSAGES.RESUMES.COMMON.NOT_FOUND);
+      throw new HttpError.NotFound(MESSAGES.RESUMES.COMMON.NOT_FOUND);
     }
     return await this.resumesRepository.updateResume(existingResume.id, title, content);
   };
@@ -54,7 +54,7 @@ export class ResumesService {
   deleteResume = async (userId, resumeId) => {
     const existingResume = await this.resumesRepository.findResumeByUserIdAndId(userId, resumeId);
     if (!existingResume) {
-      throw new NotFoundError(MESSAGES.RESUMES.COMMON.NOT_FOUND);
+      throw new HttpError.NotFound(MESSAGES.RESUMES.COMMON.NOT_FOUND);
     }
     return await this.resumesRepository.deleteResume(existingResume.id);
   };

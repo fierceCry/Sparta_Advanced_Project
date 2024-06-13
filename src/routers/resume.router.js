@@ -36,5 +36,4 @@ resumeRouter.patch('/:resumeId/logs', authMiddleware, resumerLogSchema, requireR
 /** 이력서 로그 상세 조회 API **/
 resumeRouter.get('/:resumeId/logs', authMiddleware, requireRoles([USER_ROLE.RECRUITER]), resumesController.getResumeLogs);
 
-
 export { resumeRouter };

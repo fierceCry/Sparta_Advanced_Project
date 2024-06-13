@@ -1,48 +1,54 @@
-import { HTTP_STATUS } from "../constants/http-status.constant.js";
-class HttpError extends Error {
-  constructor(statusCode, message) {
-    super(message);
-    this.statusCode = statusCode;
-    this.name = this.constructor.name;
-    Error.captureStackTrace(this, this.constructor);
+// src/errors/http.error.js
+
+import { HTTP_STATUS } from '../constants/http-status.constant.js';
+
+class BadRequest {
+  constructor(message = BadRequest.name) {
+    this.message = message;
+    this.status = HTTP_STATUS.BAD_REQUEST;
   }
 }
 
-class BadRequestError extends HttpError {
-  constructor(message = 'Bad Request') {
-    super(HTTP_STATUS.BAD_REQUEST, message);
+class Unauthorized {
+  constructor(message = Unauthorized.name) {
+    this.message = message;
+    this.status = HTTP_STATUS.UNAUTHORIZED;
   }
 }
 
-class UnauthorizedError extends HttpError {
-  constructor(message = 'Unauthorized') {
-    super(HTTP_STATUS.UNAUTHORIZED, message);
+class Forbidden {
+  constructor(message = Forbidden.name) {
+    this.message = message;
+    this.status = HTTP_STATUS.FORBIDDEN;
   }
 }
 
-class ForbiddenError extends HttpError {
-  constructor(message = 'Forbidden') {
-    super(HTTP_STATUS.FORBIDDEN, message);
+class NotFound {
+  constructor(message = NotFound.name) {
+    this.message = message;
+    this.status = HTTP_STATUS.NOT_FOUND;
   }
 }
 
-class NotFoundError extends HttpError {
-  constructor(message = 'Not Found') {
-    super(HTTP_STATUS.NOT_FOUND, message);
+class Conflict {
+  constructor(message = Conflict.name) {
+    this.message = message;
+    this.status = HTTP_STATUS.CONFLICT;
   }
 }
 
-class InternalServerError extends HttpError {
-  constructor(message = 'Internal Server Error') {
-    super(HTTP_STATUS.INTERNAL_SERVER_ERROR, message);
+class InternalServerError {
+  constructor(message = InternalServerError.name) {
+    this.message = message;
+    this.status = HTTP_STATUS.INTERNAL_SERVER_ERROR;
   }
 }
 
-export {
-  HttpError,
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  InternalServerError
+export const HttpError = {
+  BadRequest,
+  Unauthorized,
+  Forbidden,
+  NotFound,
+  Conflict,
+  InternalServerError,
 };

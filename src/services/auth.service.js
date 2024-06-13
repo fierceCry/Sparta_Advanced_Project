@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { ENV_KEY } from '../constants/env.constant.js';
 import { MESSAGES } from '../constants/message.constant.js';
-import { BadRequestError, UnauthorizedError } from '../errors/http.error.js';
+import { HttpError } from '../errors/http.error.js';
 import {
   HASH_SALT_ROUNDS,
   ACCESS_TOKEN_EXPIRES_IN,
@@ -16,7 +16,7 @@ export class AuthService {
   signUp = async (email, password, nickname) => {
     const userData = await this.userRepository.findOne(email);
     if (userData) {
-      throw new BadRequestError(MESSAGES.AUTH.COMMON.EMAIL.DUPLICATED);
+      throw new HttpError.BadRequest(MESSAGES.AUTH.COMMON.EMAIL.DUPLICATED);
     }
     const hashPasswrd = bcrypt.hashSync(password, HASH_SALT_ROUNDS);
     const { password: _, ...result } = await this.userRepository.userCreate(
@@ -31,12 +31,12 @@ export class AuthService {
   signIn = async (email, password) => {
     const userData = await this.userRepository.findOne(email);
     if (!userData) {
-      throw new UnauthorizedError(MESSAGES.AUTH.COMMON.EMAIL.INVALID_USER);
+      throw new HttpError.Unauthorized(MESSAGES.AUTH.COMMON.EMAIL.INVALID_USER);
     }
 
     const isMatched = bcrypt.compareSync(password, userData.password);
     if (!isMatched) {
-      throw new UnauthorizedError(MESSAGES.AUTH.COMMON.UNAUTHORIZED);
+      throw new HttpError.Unauthorized(MESSAGES.AUTH.COMMON.UNAUTHORIZED);
     }
     const { accessToken, refreshToken } = this.generateTokens(userData.id);
 

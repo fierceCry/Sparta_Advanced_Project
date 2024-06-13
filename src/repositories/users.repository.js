@@ -7,6 +7,7 @@ export class UserRepository {
       where: { id: userId },
     });
   };
+
   updateOrCreateToken = async (userId, refreshToken) => {
     const existingToken = await this.prisma.refreshToken.findFirst({
       where: { userId },
@@ -58,4 +59,10 @@ export class UserRepository {
       create: { userId: id, refreshToken: refreshToken },
     });
   };
+
+  findByToken = async (id)=>{
+    return await this.prisma.refreshToken.findUnique({
+      where:{ userId: id}
+    })
+  }
 }
